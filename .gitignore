@@ -1,0 +1,31 @@
+﻿# === SECRETS - NEVER COMMIT THESE ===
+*.json
+service-account*.json
+*-key.json
+*-credentials.json
+.env
+.env.*
+!.env.example
+secrets/
+
+# === Python ===
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# === Terraform ===
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# === Logs ===
+*.log
