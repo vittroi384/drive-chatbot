@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     google_oauth_redirect_uri: str = "http://localhost:8000/auth/callback"
     google_domain: str = "aicoschool.com"  # OAuth domain allowlist
+    allowed_emails: str = ""
     session_secret_key: str = ""
 
     # --- Vertex AI Search ----------------------------------------------------
