@@ -1,13 +1,13 @@
-"""Application configuration.
+"""애플리케이션 설정.
 
-All runtime config comes from environment variables / the .env file, loaded
-via pydantic-settings (v2). Nothing is hard-coded here, which is what makes the
-white-label model work: COMPANY_NAME, SYSTEM_PROMPT, GEMINI_MODEL, etc. are all
-per-deployment .env values (see master context: 화이트라벨 구조).
+모든 런타임 설정은 환경변수 / .env 파일에서 오며, pydantic-settings(v2)를
+통해 로드된다. 여기에는 하드코딩된 값이 없고, 바로 그 점이 화이트라벨 모델을
+가능하게 한다: COMPANY_NAME, SYSTEM_PROMPT, GEMINI_MODEL 등은 모두 배포별
+.env 값이다 (마스터 컨텍스트: 화이트라벨 구조 참고).
 
-Usage:
+사용법:
     from app.config import get_settings
-    settings = get_settings()   # cached singleton
+    settings = get_settings()   # 캐시된 싱글톤
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Typed view over the .env file."""
+    """.env 파일에 대한 타입 지정 뷰(view)."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- Application ---------------------------------------------------------
+    # --- 애플리케이션 --------------------------------------------------------
     app_name: str = "Drive Chatbot"
     company_name: str = "aicoschool"
     company_logo_url: str = ""
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
     google_oauth_redirect_uri: str = "http://localhost:8000/auth/callback"
-    google_domain: str = "aicoschool.com"  # OAuth domain allowlist
+    google_domain: str = "aicoschool.com"  # OAuth 도메인 허용 목록(allowlist)
     allowed_emails: str = ""
     session_secret_key: str = ""
 
@@ -63,30 +63,31 @@ class Settings(BaseSettings):
     vertex_location: str = "global"  # REGION_VERTEX_SEARCH
 
     # --- Gemini --------------------------------------------------------------
-    # NOTE(검증 2026-05): gemini-1.5-* / 2.0-* are retired/closed to new
-    # projects. 2.5-flash retires 2026-10-16 (mid-beta). Default chosen to
-    # survive the whole beta window without a forced migration. See 보조 ADR.
+    # NOTE(검증 2026-05): gemini-1.5-* / 2.0-* 는 신규 프로젝트에 폐기/차단됨.
+    # 2.5-flash 는 2026-10-16 폐기 예정(베타 도중). 베타 기간 전체를 강제
+    # 마이그레이션 없이 버틸 수 있도록 기본값 선택. 보조 ADR 참고.
     gemini_model: str = "gemini-3-flash"
     gemini_location: str = "us-central1"  # REGION_VERTEX (서울 미지원 모델 회피)
 
-    # --- Search backend ------------------------------------------------------
+    # --- 검색 백엔드 ---------------------------------------------------------
     search_mode: Literal["vertex", "oauth", "hybrid"] = "hybrid"
 
     # --- GCS -----------------------------------------------------------------
     gcs_docs_bucket: str = "drive-chatbot-dev-personal-docs"
 
     # --- Firestore -----------------------------------------------------------
+    # database.py 가 AsyncClient(database=...) 에 넘기는 값. "(default)" = 기본 DB.
     firestore_database: str = "(default)"
 
-    # --- Rate limit ----------------------------------------------------------
+    # --- 요청 제한 (Rate limit) ----------------------------------------------
     rate_limit_per_minute: int = 5
 
 
 @lru_cache
 def get_settings() -> Settings:
-    """Return a cached Settings singleton.
+    """캐시된 Settings 싱글톤을 반환한다.
 
-    @lru_cache ensures the .env file is parsed exactly once per process.
-    Tests can clear the cache with ``get_settings.cache_clear()``.
+    @lru_cache 덕분에 .env 파일은 프로세스당 정확히 한 번만 파싱된다.
+    테스트에서는 ``get_settings.cache_clear()`` 로 캐시를 비울 수 있다.
     """
     return Settings()
