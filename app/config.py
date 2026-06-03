@@ -71,7 +71,8 @@ class Settings(BaseSettings):
 
     # --- 검색 백엔드 ---------------------------------------------------------
     search_mode: Literal["vertex", "oauth", "hybrid"] = "hybrid"
-
+    enable_validation: bool = True
+    vertex_search_target: Literal["data_store", "engine"] = "data_store"
     # --- GCS -----------------------------------------------------------------
     gcs_docs_bucket: str = "drive-chatbot-dev-personal-docs"
 
