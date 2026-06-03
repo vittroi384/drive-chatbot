@@ -1,24 +1,23 @@
-"""Search backend abstraction layer.
+"""검색 백엔드 추상화 레이어 (search backend abstraction).
 
-This module defines the abstract contract that every document search backend
-must satisfy. The point of this abstraction is to keep the rest of the
-application (AI service, routers) decoupled from *how* documents are actually
-retrieved, so that the retrieval backend can be swapped without touching
-business logic.
+모든 문서 검색 backend가 따라야 하는 추상 contract를 정의한다. 이 추상화의
+목적은 앱의 나머지 부분(AI service, router)을 "문서를 실제로 *어떻게* 가져오는가"
+와 decouple 하는 것 — retrieval backend를 business logic 건드리지 않고 교체할
+수 있게 하기 위함이다.
 
-Current implementations (see sibling modules):
-    - VertexSearchBackend  : Vertex AI Search datastore (GCS-indexed docs)
-    - OAuthDriveBackend    : per-user Google Drive search via OAuth token
-    - HybridBackend        : merge + re-rank results from both
+현재 구현체 (sibling 모듈 참고):
+    - VertexSearchBackend  : Vertex AI Search datastore (GCS-indexed 문서)
+    - OAuthDriveBackend    : 사용자별 Google Drive 검색 (OAuth token 사용)
+    - HybridBackend        : 두 backend 결과를 merge + 정규화
 
-Future migration options preserved by this contract (do NOT implement now):
-    - PgVectorBackend      : self-hosted pgvector, if/when we move off Vertex
-                             Search for cost or control reasons (see 22단계).
-    - Additional connectors: Notion / Confluence / Slack search, etc.
+이 contract로 보존되는 future migration 옵션 (지금 구현하지 말 것):
+    - PgVectorBackend      : self-hosted pgvector. 비용/제어 이유로 Vertex
+                             Search에서 이탈할 경우 (22단계 참고).
+    - 추가 connector       : Notion / Confluence / Slack 검색 등.
 
-Because every backend returns the same ``SearchResult`` shape and implements
-the same ``search`` coroutine, migration is a config change
-(``SEARCH_MODE`` in .env), not a rewrite.
+모든 backend가 동일한 ``SearchResult`` 모양을 반환하고 동일한 ``search``
+coroutine을 구현하기 때문에, migration은 rewrite가 아니라 config 변경
+(.env의 ``SEARCH_MODE``)으로 끝난다.
 """
 
 from __future__ import annotations
@@ -30,20 +29,20 @@ from typing import Any
 
 @dataclass(slots=True)
 class SearchResult:
-    """A single retrieved chunk, normalized across all backends.
+    """단일 retrieved chunk. 모든 backend에 걸쳐 normalize된 공통 모양.
 
-    Every backend MUST map its native response into this shape so downstream
-    code (re-ranking, prompt assembly, answer-grounding checks) never needs to
-    know which backend produced the result.
+    각 backend는 자신의 native response를 반드시 이 모양으로 mapping 해야 한다.
+    그래야 downstream 코드(re-ranking, prompt assembly, answer-grounding 검증)가
+    "어느 backend가 만든 결과인지" 전혀 몰라도 동작한다.
 
     Attributes:
-        content: The retrieved text chunk.
-        source_uri: Canonical locator (gs:// URI, Drive file URL, etc.).
-        source_title: Human-readable document title for citations.
-        chunk_index: Position of this chunk within its source document.
-        score: Backend-native relevance score. NOT comparable across
-            backends without normalization (HybridBackend handles that).
-        metadata: Free-form extras (mime type, last_modified, page, etc.).
+        content: retrieved된 text chunk (본문/스니펫/추출 답변).
+        source_uri: canonical locator (gs:// URI, Drive file URL 등).
+        source_title: 인용(citation)용 사람이 읽을 수 있는 문서 제목.
+        chunk_index: source 문서 내에서 이 chunk의 위치.
+        score: backend-native relevance score. 정규화 없이는 backend 간
+            비교 불가 (HybridBackend가 normalize 담당).
+        metadata: 자유 형식 부가정보 (mime type, last_modified, page 등).
     """
 
     content: str
@@ -55,14 +54,14 @@ class SearchResult:
 
 
 class DocumentSearchService(ABC):
-    """Abstract base class for all document search backends.
+    """모든 문서 검색 backend의 abstract base class.
 
-    Subclasses implement ``search``. Keeping a single async method keeps the
-    surface small and makes every backend trivially mockable in tests
-    (see tests/test_search.py).
+    subclass는 ``search``를 구현한다. async method 하나로 surface를 작게
+    유지해서, 모든 backend를 test에서 손쉽게 mock 할 수 있게 한다
+    (tests/test_search.py 참고).
     """
 
-    #: Short identifier used in logs / metrics (e.g. "vertex", "oauth", "hybrid").
+    #: 로그/metric에서 쓰는 짧은 식별자 (예: "vertex", "oauth", "hybrid").
     backend_name: str = "base"
 
     @abstractmethod
@@ -74,25 +73,24 @@ class DocumentSearchService(ABC):
         user_oauth_token: str | None = None,
         top_k: int = 20,
     ) -> list[SearchResult]:
-        """Retrieve the most relevant chunks for ``query``.
+        """``query``에 가장 relevant한 chunk들을 retrieve 한다.
 
         Args:
-            query: The user's natural-language question.
-            user_email: Identity of the requester. Used for per-user access
-                control and usage metering. Required even for shared corpora
-                so backends can enforce domain/tenant boundaries.
-            user_oauth_token: The user's Google OAuth access token. Required
-                by OAuthDriveBackend to search the user's own Drive; ignored
-                by purely server-side backends like VertexSearchBackend.
-            top_k: How many candidates to return *before* any re-ranking.
-                The AI service re-ranks top_k down to a smaller top-5
-                (see 7단계).
+            query: 사용자의 자연어 질문.
+            user_email: 요청자 identity. 사용자별 access control + 사용량
+                metering에 사용. 공용 corpus에서도 backend가 domain/tenant
+                boundary를 enforce 할 수 있도록 required.
+            user_oauth_token: 사용자의 Google OAuth access token. 사용자
+                본인 Drive를 검색하는 OAuthDriveBackend에 required. Vertex처럼
+                순수 server-side backend는 무시한다.
+            top_k: re-ranking *이전에* 반환할 candidate 수. AI service가 top_k를
+                더 작은 top-5로 re-rank 한다 (7단계 참고).
 
         Returns:
-            Up to ``top_k`` SearchResult items, ordered by the backend's own
-            relevance score (descending). May be empty.
+            backend 자체 relevance score 기준 내림차순으로 정렬된 최대 ``top_k``개
+            SearchResult. 비어 있을 수 있음.
 
         Raises:
-            NotImplementedError: If the concrete backend is not yet wired up.
+            NotImplementedError: 해당 concrete backend가 아직 wiring 안 된 경우.
         """
         raise NotImplementedError
