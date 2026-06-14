@@ -53,26 +53,27 @@ class Settings(BaseSettings):
     session_secret_key: str = ""
 
     # --- Vertex AI Search ----------------------------------------------------
-    # NOTE(3단계): data store 와 search app(engine) 이 둘 다 생성됨.
-    # 결정 필요(7단계): 검색 질의를 data store serving config 로 보낼지,
-    # engine(app) serving config 로 보낼지. discoveryengine SDK 경로 형식
-    # 확인 후 확정. 지금은 둘 다 .env 에 보존만.
+    # 7단계 확정: 검색 질의는 engine(app) serving config 로 보낸다.
+    #   data store 직접 경로(dataStores/{id}/servingConfigs/default_config)는 404.
+    #   정답: engines/{engine_id}/servingConfigs/default_serving_config
+    #   (vertex_search_target=engine, vertex_serving_config=default_serving_config)
     vertex_data_store_id: str = ""   # short id, 예: drive-chatbot-docs_1779695818715
     vertex_engine_id: str = ""       # search app id, 예: drive-chatbot-search_1779696087733
-    vertex_serving_config: str = "default_config"
+    vertex_serving_config: str = "default_serving_config"
     vertex_location: str = "global"  # REGION_VERTEX_SEARCH
 
     # --- Gemini --------------------------------------------------------------
-    # NOTE(검증 2026-05): gemini-1.5-* / 2.0-* 는 신규 프로젝트에 폐기/차단됨.
-    # 2.5-flash 는 2026-10-16 폐기 예정(베타 도중). 베타 기간 전체를 강제
-    # 마이그레이션 없이 버틸 수 있도록 기본값 선택. 보조 ADR 참고.
-    gemini_model: str = "gemini-3-flash"
+    # NOTE(검증 2026-06): gemini-1.5-* / 2.0-* 는 신규 프로젝트에 폐기/차단됨.
+    # gemini-3-flash 는 Gemini Developer API 이름일 뿐 Vertex 엔 미존재(404) →
+    # Vertex 라이브인 gemini-2.5-flash 사용(2026-10-16 폐기 예정, 베타 기간 커버).
+    # 모델명은 .env 한 줄로 교체 가능. 보조 ADR 참고.
+    gemini_model: str = "gemini-2.5-flash"
     gemini_location: str = "us-central1"  # REGION_VERTEX (서울 미지원 모델 회피)
 
     # --- 검색 백엔드 ---------------------------------------------------------
     search_mode: Literal["vertex", "oauth", "hybrid"] = "hybrid"
     enable_validation: bool = True
-    vertex_search_target: Literal["data_store", "engine"] = "data_store"
+    vertex_search_target: Literal["data_store", "engine"] = "engine"
     # --- GCS -----------------------------------------------------------------
     gcs_docs_bucket: str = "drive-chatbot-dev-personal-docs"
 

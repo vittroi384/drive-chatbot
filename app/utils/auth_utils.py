@@ -41,6 +41,24 @@ def get_user_oauth_token(request: Request) -> dict | None:
     return request.session.get("oauth_token")
 
 
+def get_user_oauth_access_token(request: Request) -> str | None:
+    """세션 OAuth 토큰 dict 에서 access_token '문자열'만 추출 (Drive API 용).
+
+    [S1] 세션에는 authlib 토큰 dict 전체가 저장돼 있다(auth.py 의 oauth_token).
+    그러나 OAuthDriveBackend 의 Credentials(token=...) 는 access_token '문자열'을
+    기대한다. dict 를 그대로 넘기면 Drive 호출이 조용히 실패(except→[])하므로,
+    라우터는 이 헬퍼로 문자열을 뽑아 ask(user_oauth_token=<문자열>) 로 넘긴다.
+
+    토큰이 없거나(미로그인) access_token 키가 없으면 None 을 반환한다.
+    → ask()→OAuthDriveBackend 는 None 토큰을 빈 결과로 처리(graceful degrade,
+      Vertex 결과만 사용)하므로 안전하다. access token 만료 시에도 동일하게 graceful.
+    """
+    token = request.session.get("oauth_token")
+    if not token:
+        return None
+    return token.get("access_token")
+
+
 def require_user_email(request: Request) -> str:
     """로그인 필수 의존성. 이메일 없으면 401.
 
