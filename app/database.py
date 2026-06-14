@@ -198,11 +198,15 @@ async def save_message(
     sources: list | None = None,
     tokens_used: int = 0,
     response_time_ms: int = 0,
+    grounded: bool | None = None,
+    confidence: float | None = None,
 ) -> str:
     """메시지를 저장하고 message_id 를 반환한다. 부모 룸의 updated_at 도 갱신한다.
 
     - role 검증: "user" | "assistant" 만 허용 (그 외 ValueError).
-    - sources/feedback 필드는 assistant role 일 때만 추가한다 (user 메시지엔 불필요).
+    - sources/feedback/grounded/confidence 필드는 assistant role 일 때만 추가한다.
+    - grounded/confidence 는 답변 검증 레이어(ai_service) 결과로, 환각률 추적의
+      핵심 신호다(14단계 BigQuery). validation 비활성 시 None 으로 들어올 수 있다.
     - 저장 후 부모 룸 updated_at 을 갱신해 목록 최신순 정렬을 유지한다.
 
     Args:
@@ -212,6 +216,8 @@ async def save_message(
         sources: assistant 답변의 출처 목록 [{title, uri, score}, ...].
         tokens_used: 사용 토큰 수 (비용/미터링 분석용).
         response_time_ms: 응답 생성 소요 시간(ms).
+        grounded: 답변이 출처에 근거하는지 (True/False/None). 환각률 추적용.
+        confidence: 검증 신뢰도 0.0~1.0 (또는 None).
 
     Returns:
         생성된 메시지 문서 ID.
@@ -227,10 +233,12 @@ async def save_message(
         "response_time_ms": response_time_ms,
         "created_at": _now(),
     }
-    # assistant 답변만 출처/피드백을 보유한다
+    # assistant 답변만 출처/피드백/검증신호를 보유한다
     if role == "assistant":
         msg["sources"] = sources or []
         msg["feedback"] = None
+        msg["grounded"] = grounded        # S6: 환각률 추적 (14단계 BigQuery)
+        msg["confidence"] = confidence
 
     room_ref = db.collection("chat_rooms").document(room_id)
     msg_ref = room_ref.collection("messages").document()
