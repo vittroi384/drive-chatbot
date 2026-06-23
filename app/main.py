@@ -10,8 +10,12 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.sessions import SessionMiddleware
@@ -68,15 +72,31 @@ app.include_router(auth_router.router)
 app.include_router(chat.router)      # /api/chat (Part C)
 app.include_router(rooms.router)     # /api/rooms, .../messages, .../feedback (Part D)
 
+# --- 정적 파일 + 템플릿 (9단계) ------------------------------------------------
+# 경로를 __file__ 기준(프로젝트 루트 = app/ 의 부모)으로 잡아 CWD 에 의존하지 않게 함.
+# → 로컬(루트에서 uvicorn 실행)과 Docker(10단계, WORKDIR 무관)에서 모두 안전.
+BASE_DIR = Path(__file__).resolve().parent.parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
-@app.get("/")
-async def root() -> dict[str, str]:
-    """랜딩 응답. 실제 챗 UI(templates/index.html)는 9단계에서 추가된다."""
-    return {
-        "app": settings.app_name,
-        "company": settings.company_name,
-        "message": f"{settings.company_name} 사내 문서 챗봇 — 준비 중",
-    }
+
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request) -> HTMLResponse:
+    """챗 UI 렌더(9단계). 화이트라벨 값(회사명/로고/추천질문)을 템플릿에 주입한다.
+
+    이 라우트는 페이지이므로, 미인증 요청은 AuthRequiredMiddleware 가 /login 으로
+    302 시킨다(=여기 도달하면 인증된 상태). API 호출(/api/*)의 401 은 app.js 가 처리.
+    """
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "app_name": settings.app_name,
+            "company_name": settings.company_name,
+            "company_logo_url": settings.company_logo_url,
+            "suggested_questions": settings.suggested_questions_list,
+        },
+    )
 
 
 @app.get("/health")
