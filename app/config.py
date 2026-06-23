@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     app_name: str = "Drive Chatbot"
     company_name: str = "aicoschool"
     company_logo_url: str = ""
+    # 빈 화면(empty state) 추천 질문. '|' 로 구분. 비어 있으면 칩 미표시.
+    # 파싱은 suggested_questions_list 프로퍼티 사용. 회사별로 .env 만 바꾸면 됨(코드 0).
+    suggested_questions: str = ""
     system_prompt: str = (
         "당신은 사내 문서 기반 어시스턴트입니다. "
         "반드시 제공된 문서 내용에만 근거해 답변하고, "
@@ -83,6 +86,12 @@ class Settings(BaseSettings):
 
     # --- 요청 제한 (Rate limit) ----------------------------------------------
     rate_limit_per_minute: int = 5
+
+    # --- 파생 값 (computed) --------------------------------------------------
+    @property
+    def suggested_questions_list(self) -> list[str]:
+        """추천 질문 칩 목록. '|' 구분, 공백/빈 항목 제거. 비어 있으면 빈 리스트(칩 미표시)."""
+        return [q.strip() for q in self.suggested_questions.split("|") if q.strip()]
 
 
 @lru_cache
