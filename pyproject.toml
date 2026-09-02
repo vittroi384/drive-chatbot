@@ -1,0 +1,36 @@
+[project]
+name = "drive-chatbot"
+version = "0.1.0"
+description = "사내 Drive 기반 RAG 챗봇 (단독 배포형, 회사=GCP 1:1)"
+requires-python = ">=3.11"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+# E/F: pyflakes+pycodestyle, I: isort, UP: pyupgrade, B: bugbear, ASYNC: async checks
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+ignore = ["E501"]  # line length handled by black/formatter
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# Google client libs ship incomplete stubs; don't fail the build on them.
+module = ["google.*", "googleapiclient.*", "slowapi.*", "authlib.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

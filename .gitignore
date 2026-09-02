@@ -1,0 +1,44 @@
+﻿# === SECRETS - NEVER COMMIT THESE ===
+*.json
+service-account*.json
+*-key.json
+*-credentials.json
+.env
+.env.*
+!.env.example
+secrets/
+
+# === Python ===
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# === Terraform ===
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# === Logs ===
+*.log
+
+# === 진행 노트 (결제계정 ID 등 민감값 포함 — 로컬 전용) ===
+progress/
+
+# === Python 캐시/빌드 (추가) ===
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+dist/
+build/

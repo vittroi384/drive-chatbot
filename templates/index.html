@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ company_name }} · {{ app_name }}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ============ Sidebar ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        {% if company_logo_url %}
+        <img class="logo" src="{{ company_logo_url }}" alt="{{ company_name }} 로고" />
+        {% endif %}
+        <span class="brand-name">{{ company_name }}</span>
+      </div>
+
+      <div class="user-info" id="user-info">로그인 확인 중…</div>
+
+      <button type="button" class="new-chat-btn" id="new-chat-btn">+ 새 대화</button>
+
+      <ul class="room-list" id="room-list"><!-- rooms injected by app.js --></ul>
+
+      <div class="sidebar-footer">
+        <a href="/logout" class="logout-link">로그아웃</a>
+      </div>
+    </aside>
+
+    <!-- 모바일 사이드바 오버레이 (탭하면 닫힘) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ============ Main chat ============ -->
+    <main class="main">
+      <header class="chat-header">
+        <button type="button" class="hamburger" id="hamburger" aria-label="메뉴 열기">☰</button>
+        <span class="room-title" id="room-title">{{ app_name }}</span>
+      </header>
+
+      <div class="messages" id="messages">
+        <div class="empty-state" id="empty-state">
+          <h2>무엇이든 물어보세요</h2>
+          <p>사내 문서를 바탕으로 답변하고, 출처를 함께 보여드려요.</p>
+          {% if suggested_questions %}
+          <div class="suggestions">
+            {% for q in suggested_questions %}
+            <button type="button" class="suggestion-chip" data-q="{{ q }}">{{ q }}</button>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="loading" id="loading" hidden>
+        <span class="dots"><span></span><span></span><span></span></span>
+        답변 생성 중…
+      </div>
+
+      <form class="composer" id="chat-form">
+        <textarea
+          id="query-input"
+          rows="1"
+          placeholder="메시지를 입력하세요  (Enter 전송 · Shift+Enter 줄바꿈)"
+          maxlength="2000"
+          autocomplete="off"></textarea>
+        <button type="submit" class="send-btn" id="send-btn">전송</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
