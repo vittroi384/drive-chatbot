@@ -125,7 +125,7 @@ uvicorn app.main:app --reload --port 8000
 - [x] Cloud Run 배포 + IAP (ADR 0012)
 - [x] IAP JWT 검증 적용 (이번 커밋)
 - [ ] 에러 핸들링 + 장애 알림 **(진행 중)**
-- [ ] 골든셋 기반 RAG 품질 평가 — 답변 정확도를 수치로 측정·개선
+- [ ] 골든셋 기반 RAG 품질 평가 — 20문항 초안 작성([docs/eval](docs/eval)), 측정 스크립트·수치는 미착수
 - [ ] BigQuery 분석 파이프라인 + 자동 리포트
 - [ ] dbt 데이터 마트
 - [ ] Terraform 모듈화 (IaC)
