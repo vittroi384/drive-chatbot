@@ -122,7 +122,7 @@ uvicorn app.main:app --reload --port 8000
 - [x] API 엔드포인트 + Rate Limit · [ ] 사용량 미터링 (현재 로그 1줄)
 - [x] 화이트라벨 UI + 사용자 피드백 수집
 - [x] Docker 패키징 + Secret Manager (ADR 0011·0013)
-- [x] Cloud Run 배포 + IAP + 커스텀 도메인 (ADR 0012)
+- [x] Cloud Run 배포 + IAP (ADR 0012)
 - [x] IAP JWT 검증 적용 (이번 커밋)
 - [ ] 에러 핸들링 + 장애 알림 **(진행 중)**
 - [ ] 골든셋 기반 RAG 품질 평가 — 답변 정확도를 수치로 측정·개선
