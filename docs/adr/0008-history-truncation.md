@@ -1,8 +1,8 @@
 # ADR 0008 — 대화 컨텍스트 truncation 정책 (최근 5 문답)
 
 - 상태(Status): Accepted
-- 날짜: 2026-06-XX
-- 관련 단계: 7단계
+- 날짜: 2026-06
+- 관련 구현: `app/ai_service.py` `_truncate_history`
 - 관련 ADR: 0007(RAG 파이프라인)
 
 ## 맥락 (Context)

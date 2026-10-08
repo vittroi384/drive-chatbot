@@ -10,7 +10,7 @@ $tools = @(
     @{ Name = "gcloud";    Cmd = "gcloud --version" },
     @{ Name = "Git";       Cmd = "git --version" },
     @{ Name = "Terraform"; Cmd = "terraform --version" }
-    # @{ Name = "Docker";    Cmd = "docker --version" }   # 10단계에서 활성화
+    # @{ Name = "Docker";    Cmd = "docker --version" }   # Docker 패키징 시 활성화
 )
 
 Write-Host "`n========================================" -ForegroundColor Yellow

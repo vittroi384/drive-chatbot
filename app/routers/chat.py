@@ -1,10 +1,10 @@
-"""Chat 엔드포인트 (8단계 — API + Rate Limit + 사용량 미터링).
+"""Chat 엔드포인트 (API + Rate Limit + 사용량 로그).
 
 POST /api/chat 하나로 RAG 전체 흐름을 HTTP 로 노출한다:
   방 확보 → 히스토리 로드 → user 저장 → ask() → assistant 저장 → 로깅 → 응답
 
 [설계 원칙]
-- AI 호출은 ai_service.ask() 한 곳에서만 (이 라우터는 오케스트레이션만, §22).
+- AI 호출은 ai_service.ask() 한 곳에서만 (이 라우터는 오케스트레이션만).
 - 모든 보안 검증(인증/소유자)은 명시적으로 — 주석의 ★ 표시 참고.
 """
 
@@ -62,7 +62,7 @@ async def create_chat(
     #   ask() 전에 저장 → 무엇을 물었는지 항상 기록(디버깅/어뷰징 추적).
     await database.save_message(room_id, "user", body.query)
 
-    # ── 4) OAuth access token 문자열 추출 (S1) ──────────────────────────────
+    # ── 4) OAuth access token 문자열 추출 ──────────────────────────────
     #   세션엔 토큰 dict 전체가 있으나 Drive 는 access_token '문자열'을 원한다.
     #   None(미로그인/만료)이면 ask()→Drive 는 빈 결과로 graceful degrade.
     oauth_token = get_user_oauth_access_token(request)
@@ -75,10 +75,10 @@ async def create_chat(
             user_oauth_token=oauth_token,
             chat_history=chat_history,
         )
-    except Exception:
+    except Exception as exc:
         # ★함정★ ask() 가 터지면 3)의 user 메시지가 '고아'로 남는다.
         #   assistant 자리에 에러 메시지를 저장해 턴을 완결시키고 500 을 반환한다.
-        #   (정식 에러 핸들링/알림은 12단계.)
+        #   (정식 에러 핸들링/알림은 후속.)
         logger.error("[chat] ask() failed (room=%s, user=%s)", room_id, user_email, exc_info=True)
         await database.save_message(
             room_id,
@@ -86,7 +86,9 @@ async def create_chat(
             "[일시적인 오류로 답변을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.]",
             grounded=None,
         )
-        raise HTTPException(status_code=500, detail="answer_generation_failed")
+        raise HTTPException(
+            status_code=500, detail="answer_generation_failed"
+        ) from exc
 
     # ── 6) assistant 메시지 저장 (출처/토큰/시간 + 검증신호 grounded/confidence) ──
     validation = result["validation"]  # ★함정★ dict 접근 (result.answer 점 접근 아님)
@@ -97,11 +99,11 @@ async def create_chat(
         sources=result["sources"],
         tokens_used=result["tokens_used"],
         response_time_ms=result["response_time_ms"],
-        grounded=validation.get("grounded"),       # S6: 환각률 추적
+        grounded=validation.get("grounded"),       # 환각률 추적
         confidence=validation.get("confidence"),
     )
 
-    # ── 7) 구조화 로깅 (14단계 BigQuery 적재 기반) ──────────────────────────
+    # ── 7) 구조화 로깅 (BigQuery 적재 기반, 예정) ──────────────────────────
     #   extra 의 키들은 Cloud Logging 에서 JSON 필드가 된다(로컬 콘솔엔 message 만 보임).
     logger.info(
         "chat_completed",

@@ -21,10 +21,17 @@
 | [0003](0003-chunking-strategy.md) | 청킹 전략 | Provisional |
 | [0004](0004-embedding-model-selection.md) | 임베딩 모델 후보 선정 | Provisional |
 | [0005](0005-hybrid-data-source.md) | 하이브리드 데이터소스 설계 | Accepted |
+| 0006 | (폐기) Firestore 스키마 초안 — 내용은 `app/database.py` 모듈 docstring 으로 대체 | — |
+| [0007](0007-rag-pipeline.md) | RAG 4단계 파이프라인 (Search → Rerank → Generate → Validate) | Accepted |
+| [0008](0008-history-truncation.md) | 대화 컨텍스트 truncation 정책 (최근 5 문답) | Accepted |
+| [0009](0009-rate-limit-policy.md) | Rate Limit 정책 (1분 5회 / 사용자) | Accepted |
+| [0010](0010-frontend-vanilla-js.md) | 프론트엔드: Vanilla JS + Jinja2 | Accepted |
+
+0006은 폐기했고 번호는 비워 둔다.
 
 ## 작성 대기 (큐)
 
 - 보조: GCP Quota 하한 한계 → 다층 방어 설계
 - 보조: drive.readonly 스코프 선택 근거
-- 보조: 회사 GCP 이전 시점 13~15단계 결정
-- 보조: Gemini 모델 수명주기 기반 선택 (gemini-3-flash) — 2026-05 발견
+- 보조: 회사 GCP 이전 시점 결정
+- 보조: Gemini 모델 수명주기 기반 선택 (현재 기본값 gemini-2.5-flash, `app/config.py`) — 2026-05 발견

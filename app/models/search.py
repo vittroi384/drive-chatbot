@@ -1,4 +1,4 @@
-"""Search-related API models. Fleshed out in 7~8단계.
+"""Search-related API models.
 
 Note: the internal retrieval result type is ``app.search.base.SearchResult``
 (a dataclass). These pydantic models are for the HTTP boundary only.

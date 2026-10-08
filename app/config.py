@@ -3,7 +3,7 @@
 모든 런타임 설정은 환경변수 / .env 파일에서 오며, pydantic-settings(v2)를
 통해 로드된다. 여기에는 하드코딩된 값이 없고, 바로 그 점이 화이트라벨 모델을
 가능하게 한다: COMPANY_NAME, SYSTEM_PROMPT, GEMINI_MODEL 등은 모두 배포별
-.env 값이다 (마스터 컨텍스트: 화이트라벨 구조 참고).
+.env 값이다.
 
 사용법:
     from app.config import get_settings
@@ -45,7 +45,8 @@ class Settings(BaseSettings):
     # --- GCP -----------------------------------------------------------------
     gcp_project_id: str = "my-gcp-project"
     gcp_location: str = "asia-northeast3"  # REGION_GENERAL (서울)
-    gcp_credentials_path: str = r"C:\dev\secrets\chatbot-app-sa.json"
+    # 서비스 계정 키 파일 경로. 비우면 ADC(GOOGLE_APPLICATION_CREDENTIALS 등)를 따른다.
+    gcp_credentials_path: str = ""
 
     # --- OAuth ---------------------------------------------------------------
     google_client_id: str = ""
@@ -55,8 +56,14 @@ class Settings(BaseSettings):
     allowed_emails: str = ""
     session_secret_key: str = ""
 
+    # --- IAP (운영: Cloud Run + IAP) -----------------------------------------
+    # X-Goog-IAP-JWT-Assertion 검증에 쓰는 audience.
+    # 형식: /projects/<PROJECT_NUMBER>/global/backendServices/<BACKEND_SERVICE_ID>
+    # 비어 있으면 IAP 경로 비활성 = 세션(OAuth)만 사용.
+    iap_audience: str = ""
+
     # --- Vertex AI Search ----------------------------------------------------
-    # 7단계 확정: 검색 질의는 engine(app) serving config 로 보낸다.
+    # 검색 질의는 engine(app) serving config 로 보낸다.
     #   data store 직접 경로(dataStores/{id}/servingConfigs/default_config)는 404.
     #   정답: engines/{engine_id}/servingConfigs/default_serving_config
     #   (vertex_search_target=engine, vertex_serving_config=default_serving_config)
@@ -69,7 +76,7 @@ class Settings(BaseSettings):
     # NOTE(검증 2026-06): gemini-1.5-* / 2.0-* 는 신규 프로젝트에 폐기/차단됨.
     # gemini-3-flash 는 Gemini Developer API 이름일 뿐 Vertex 엔 미존재(404) →
     # Vertex 라이브인 gemini-2.5-flash 사용(2026-10-16 폐기 예정, 베타 기간 커버).
-    # 모델명은 .env 한 줄로 교체 가능. 보조 ADR 참고.
+    # 모델명은 .env 한 줄로 교체 가능.
     gemini_model: str = "gemini-2.5-flash"
     gemini_location: str = "us-central1"  # REGION_VERTEX (서울 미지원 모델 회피)
 

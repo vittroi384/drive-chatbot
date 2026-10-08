@@ -4,7 +4,7 @@
     python scripts/test_firestore.py
 
 사전 조건:
-    - GOOGLE_APPLICATION_CREDENTIALS 환경변수 = 서비스계정 키 경로 (1단계에서 설정)
+    - GOOGLE_APPLICATION_CREDENTIALS 환경변수 = 서비스계정 키 경로
     - GCP_PROJECT_ID = my-gcp-project
     - Firestore 가 Native mode 로 활성화되어 있을 것
 

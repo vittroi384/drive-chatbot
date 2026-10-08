@@ -1,6 +1,6 @@
 "use strict";
 /* ===========================================================================
-   Drive Chatbot — 채팅 클라이언트 (9단계)
+   Drive Chatbot — 채팅 클라이언트
    구조: 상태 → DOM refs → API 헬퍼 → 유틸 → 렌더 → 액션 → 이벤트
    API 응답 모양(app/models/chat.py):
      ChatResponse  {room_id, message_id, answer, sources[{title,uri,score}], ...}

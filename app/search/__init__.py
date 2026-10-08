@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-from app.config import get_settings
+from app.config import Settings, get_settings
 
 from .base import DocumentSearchService, SearchResult
 from .hybrid import HybridBackend
@@ -24,7 +24,7 @@ __all__ = [
 ]
 
 
-def _build_vertex(settings) -> VertexSearchBackend:
+def _build_vertex(settings: Settings) -> VertexSearchBackend:
     """settings에서 Vertex backend를 조립. location은 VERTEX_LOCATION(global) 사용."""
     return VertexSearchBackend(
         project_id=settings.gcp_project_id,

@@ -1,17 +1,18 @@
-"""Google OAuth 로그인 라우트 (5단계, feat/oauth-login).
+"""Google OAuth 로그인 라우트.
 
 흐름: /login → 구글 → /auth/callback → 도메인검증 → 세션저장 → /
-로컬은 OAuth 세션 방식. 운영(11단계)은 IAP 가 앞단에서 처리하므로
+로컬은 OAuth 세션 방식. 운영은 IAP 가 앞단에서 처리하므로
 이 라우트들은 주로 로컬/개발 로그인 경로로 쓰임.
 """
 
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from starlette.status import HTTP_403_FORBIDDEN
 
 from app.config import get_settings
@@ -45,7 +46,7 @@ oauth.register(
 
 
 @router.get("/login")
-async def login(request: Request):
+async def login(request: Request) -> Response:
     """구글 로그인 페이지로 리다이렉트.
 
     redirect_uri 는 반드시 settings 값(=콘솔 등록값)과 정확히 일치해야 함.
@@ -58,7 +59,7 @@ async def login(request: Request):
 
 
 @router.get("/auth/callback")
-async def auth_callback(request: Request):
+async def auth_callback(request: Request) -> Response:
     """구글이 돌려보낸 콜백. code→토큰 교환 + 도메인검증 + 세션저장."""
     try:
         token = await oauth.google.authorize_access_token(request)
@@ -93,14 +94,14 @@ async def auth_callback(request: Request):
 
 
 @router.get("/logout")
-async def logout(request: Request):
+async def logout(request: Request) -> RedirectResponse:
     """세션 클리어 후 /login 으로."""
     request.session.clear()
     return RedirectResponse(url="/login")
 
 
 @router.get("/me")
-async def me(request: Request):
+async def me(request: Request) -> dict[str, Any]:
     """현재 로그인 유저 정보. 미인증이어도 200 + authenticated:false 반환.
 
     (미들웨어 PUBLIC_PATHS 에 /me 포함 → 리다이렉트 안 되고 JSON 그대로 나옴)

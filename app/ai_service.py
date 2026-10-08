@@ -1,7 +1,7 @@
 """AI service — RAG 파이프라인 본체 (Search → Rerank → Generate → Validate).
 
 이 모듈은 앱에서 **유일하게 generative AI API를 직접 호출**하는 곳이다
-(다른 파일은 ai_service를 import만 한다 — 마스터 컨텍스트 원칙).
+(다른 파일은 ai_service를 import만 한다).
 
 [SDK] google-genai (구 vertexai.generative_models는 2026-06-24 제거 예정 → 사용 안 함).
     - Vertex backend로 client 생성: genai.Client(vertexai=True, project, location)
@@ -295,7 +295,7 @@ async def generate_answer(
             logger.warning("[ai] empty answer from model")
             return NOT_FOUND_MESSAGE, tokens
         return answer, tokens
-    except Exception:  # noqa: BLE001 - 12단계 정식 handling
+    except Exception:  # noqa: BLE001 - 정식 에러 핸들링은 후속
         logger.error("[ai] generate_answer failed", exc_info=True)
         return "[답변 생성 중 오류가 발생했습니다.]", 0
 

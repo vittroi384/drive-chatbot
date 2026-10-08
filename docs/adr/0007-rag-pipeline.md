@@ -1,13 +1,13 @@
 # ADR 0007 — RAG 4단계 파이프라인 (Search → Rerank → Generate → Validate)
 
 - 상태(Status): Accepted
-- 날짜: 2026-06-XX
-- 관련 단계: 7단계
+- 날짜: 2026-06
+- 관련 구현: `app/ai_service.py`
 - 관련 ADR: 0003(청킹), 0004(임베딩), 0005(하이브리드 데이터소스)
 
 ## 맥락 (Context)
 
-3단계에서 Vertex AI Search datastore + 검색 앱을 구성했고, 검색 자체는 동작한다.
+Vertex AI Search datastore + 검색 앱을 구성했고, 검색 자체는 동작한다.
 하지만 사내 QA 챗봇으로 쓰려면 두 가지가 부족했다.
 
 1. 한국어 검색 정확도 — Vertex 자동 청킹/임베딩(text-embedding-004)의 top 결과가
@@ -45,7 +45,7 @@ SDK는 **google-genai**로 확정한다. `genai.Client(vertexai=True, project, l
 - (−) rerank/validate가 그 자체로 또 다른 실패 지점 → 각각 fallback 필수
   (rerank 실패 → 원본 top_n, validate 실패 → grounded=True + 로그).
 - (+) 환각 방지가 "프롬프트 + 사후 검증" 이중 레이어가 됨 → grounded 비율을
-  운영 데이터로 측정 가능 (블로그 3편 메인 소재).
+  운영 데이터로 측정 가능.
 - (+) 검색 backend가 추상화돼 있어 rerank/generate는 backend에 무관하게 동작.
 - (+) 죽어가는 SDK를 미리 버려서 2026-06-24 강제 마이그레이션을 회피.
 
@@ -58,7 +58,7 @@ SDK는 **google-genai**로 확정한다. `genai.Client(vertexai=True, project, l
 
 ## 후속 (Follow-ups)
 
-- 13단계 골든셋으로 rerank 전/후 정확도, grounded 비율 정량 측정.
+- 골든셋 구축 후 rerank 전/후 정확도, grounded 비율 정량 측정.
 - 지연이 문제면 rerank/generate 일부 병렬화 또는 validate 샘플링 검토.
-- SDK 전환은 본 ADR에 녹였지만, "deprecated SDK 사전 이탈"은 독립 ADR(0009)로
-  분리해도 좋음 (면접 카드 가치).
+- SDK 전환은 본 ADR에 녹였다. "deprecated SDK 사전 이탈"은 필요 시 별도 ADR로
+  분리한다(번호 미정. 0009는 Rate Limit 정책).

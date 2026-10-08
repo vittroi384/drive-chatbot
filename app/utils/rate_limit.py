@@ -1,9 +1,9 @@
-"""Rate limiting (8단계, ADR 0009 — 작성 예정).
+"""Rate limiting (ADR 0009).
 
 slowapi 기반, 1분당 N회 제한. ★키는 IP 가 아니라 user_email★ 이 핵심.
 
 [왜 IP 가 아니라 user_email 인가]
-slowapi 기본 키는 get_remote_address(=클라이언트 IP). 그러나 운영(11단계 Cloud Run +
+slowapi 기본 키는 get_remote_address(=클라이언트 IP). 그러나 운영(Cloud Run +
 IAP)에서는 모든 트래픽이 프록시/IAP 를 거쳐 들어오므로 IP 가 공유되거나 프록시 IP 로
 보인다 → IP 기준이면 한 사용자가 한도를 쓰면 전체 사용자가 막힌다. 사용자별 비용/어뷰징
 방어가 목적이므로 인증된 user_email 을 키로 쓰고, 미인증(이메일 없음) 일 때만 IP 로 폴백한다.

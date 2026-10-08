@@ -1,6 +1,6 @@
 """Vertex AI Search backend (GCS-indexed corpus).
 
-3단계에서 만든 Vertex AI Search datastore를 query 하는 server-side backend.
+Vertex AI Search datastore를 query 하는 server-side backend.
 사용자 OAuth token을 쓰지 않는다 — access control은 coarse(corpus 전체).
 
 [중요] retrieval-only로 동작한다.
@@ -38,7 +38,7 @@ class VertexSearchBackend(DocumentSearchService):
     serving_config 경로는 두 가지 target을 지원한다 (.env의 VERTEX_SEARCH_TARGET):
         - "data_store" : dataStores/{id}/servingConfigs/{cfg}  (기본, .env와 일치)
         - "engine"     : engines/{id}/servingConfigs/{cfg}     (NOT_FOUND 시 fallback)
-    둘 다 동작하며, 어떤 게 맞는지는 runtime에서 한 번 확인하면 된다 (7단계 §19).
+    둘 다 동작하며, 어떤 게 맞는지는 runtime에서 한 번 확인하면 된다.
     """
 
     backend_name = "vertex"
@@ -136,7 +136,7 @@ class VertexSearchBackend(DocumentSearchService):
                 self.search_target,
             )
             return results
-        except Exception:  # noqa: BLE001 - 12단계에서 정식 error handling
+        except Exception:  # noqa: BLE001 - 정식 에러 핸들링은 후속
             # 검색 실패는 빈 리스트로 안전하게 fallback (pipeline 중단 방지).
             logger.error("[vertex] search failed for query=%r", query, exc_info=True)
             return []

@@ -59,7 +59,7 @@ class HybridBackend(DocumentSearchService):
 
         merged: list[SearchResult] = []
         for label, res in (("vertex", vertex_res), ("oauth", oauth_res)):
-            if isinstance(res, Exception):
+            if isinstance(res, BaseException):
                 logger.error("[hybrid] %s backend failed", label, exc_info=res)
                 continue
             merged.extend(self._normalize_by_rank(res))

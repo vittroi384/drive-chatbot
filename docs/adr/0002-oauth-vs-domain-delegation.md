@@ -20,6 +20,6 @@
 - 공용 문서는 별도로 GCS + Vertex AI Search에 인덱싱(ADR 0005)해 보완.
 
 ## 트레이드오프
-- 사용자마다 OAuth 동의/토큰 갱신 흐름 필요 → 구현 복잡도 증가(5단계).
+- 사용자마다 OAuth 동의/토큰 갱신 흐름 필요 → 구현 복잡도 증가.
 - restricted scope(`drive.readonly`)는 Production 게시 시 Google verification 필요 → 회사 GCP 이전 시 Internal로 우회(보조 ADR).
 - 전사 문서 일괄 인덱싱 불가 → 공용 코퍼스는 GCS 경로로만. 개인 Drive와 공용을 Hybrid로 합침.

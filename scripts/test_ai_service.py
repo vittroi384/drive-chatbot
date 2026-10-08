@@ -18,7 +18,7 @@ from app.ai_service import ask
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
-# 3단계 GCS 인덱스에 있는 주제 / 없는 주제
+# GCS 인덱스에 있는 주제 / 없는 주제
 SCENARIOS = [
     ("휴가는 며칠인가요?", "인덱스에 있는 질문 (답변+출처 기대)"),
     ("오늘 서울 날씨 알려줘", "인덱스에 없는 질문 (NOT_FOUND 기대)"),

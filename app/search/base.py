@@ -12,7 +12,7 @@
 
 이 contract로 보존되는 future migration 옵션 (지금 구현하지 말 것):
     - PgVectorBackend      : self-hosted pgvector. 비용/제어 이유로 Vertex
-                             Search에서 이탈할 경우 (22단계 참고).
+                             Search에서 이탈할 경우.
     - 추가 connector       : Notion / Confluence / Slack 검색 등.
 
 모든 backend가 동일한 ``SearchResult`` 모양을 반환하고 동일한 ``search``
@@ -84,7 +84,7 @@ class DocumentSearchService(ABC):
                 본인 Drive를 검색하는 OAuthDriveBackend에 required. Vertex처럼
                 순수 server-side backend는 무시한다.
             top_k: re-ranking *이전에* 반환할 candidate 수. AI service가 top_k를
-                더 작은 top-5로 re-rank 한다 (7단계 참고).
+                더 작은 top-5로 re-rank 한다 (ai_service.ask 참고).
 
         Returns:
             backend 자체 relevance score 기준 내림차순으로 정렬된 최대 ``top_k``개

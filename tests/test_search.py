@@ -1,7 +1,6 @@
-"""Tests for the search backend abstraction (4단계).
+"""Tests for the search backend abstraction.
 
-These tests assert the *contract*, not any real backend (those are stubs
-until 7단계). They guarantee that:
+These tests assert the *contract*, not any real backend. They guarantee that:
   - the ABC cannot be instantiated directly,
   - SearchResult has the agreed shape,
   - a conforming backend satisfies the async interface.

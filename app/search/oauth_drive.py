@@ -4,7 +4,7 @@
 사용자 token을 쓰므로 Google의 ACL이 자동 적용 → 다른 사용자 문서는 보이지 않는다.
 
 [1차 범위] 본문 추출은 아직 구현하지 않는다 (제목만 content로 사용).
-    13단계 골든셋 평가 후 본문 추출(파일 export/다운로드 + 파싱) 추가 결정.
+    골든셋 평가 후 본문 추출(파일 export/다운로드 + 파싱) 추가 결정.
 
 [함정] googleapiclient는 동기(sync) 라이브러리다. async pipeline 안에서 그냥
     호출하면 event loop를 block 한다 → asyncio.to_thread로 thread off-load.
@@ -40,7 +40,7 @@ class OAuthDriveBackend(DocumentSearchService):
         top_k: int = 20,
     ) -> list[SearchResult]:
         # token이 없으면 검색 불가 → 빈 리스트 + 경고.
-        # (예: 7단계 test 스크립트는 세션이 없어 token=None → 정상적으로 빈 결과)
+        # (예: scripts/test_ai_service.py 는 세션이 없어 token=None → 정상적으로 빈 결과)
         if not user_oauth_token:
             logger.warning(
                 "[oauth] no OAuth token for %s → skip Drive search", user_email
@@ -51,7 +51,7 @@ class OAuthDriveBackend(DocumentSearchService):
             files = await asyncio.to_thread(
                 self._search_drive_sync, user_oauth_token, query, top_k
             )
-        except Exception:  # noqa: BLE001 - 12단계 정식 handling
+        except Exception:  # noqa: BLE001 - 정식 에러 핸들링은 후속
             logger.error(
                 "[oauth] Drive search failed for %s, query=%r",
                 user_email,
@@ -62,7 +62,7 @@ class OAuthDriveBackend(DocumentSearchService):
 
         results = [
             SearchResult(
-                # 1차: 제목만 content로 (본문 추출은 13단계).
+                # 1차: 제목만 content로 (본문 추출은 미구현).
                 content=f.get("name", ""),
                 source_uri=f.get("webViewLink", ""),
                 source_title=f.get("name", "(이름 없음)"),

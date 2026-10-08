@@ -1,6 +1,6 @@
 """Firestore 비동기 클라이언트 + 채팅 스키마 접근 계층.
 
-스키마 구조 (ADR 0006):
+스키마 구조 (ADR 0006 은 폐기, 이 docstring 이 기준):
     chat_rooms (컬렉션)
       └─ {room_id} (문서)
            └─ messages (서브컬렉션)
@@ -14,7 +14,7 @@
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from google.cloud import firestore_v1
 from google.cloud.firestore_v1.base_query import FieldFilter
@@ -56,10 +56,10 @@ def _now() -> datetime:
     """UTC timezone-aware 현재 시각.
 
     ★ datetime.now() (naive) 를 쓰면 타임존 정보가 없어 Firestore 저장 시
-      해석이 모호해진다. 반드시 timezone.utc 를 붙여 aware datetime 으로 저장한다.
+      해석이 모호해진다. 반드시 UTC 를 붙여 aware datetime 으로 저장한다.
       (Firestore 는 내부적으로 UTC 기준 timestamp 로 보관)
     """
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 async def warmup_firestore() -> None:
@@ -131,7 +131,7 @@ async def get_rooms(user_email: str, limit: int = 50) -> list[dict]:
     rooms: list[dict] = []
     # stream() 은 AsyncStreamGenerator 를 반환 → async for 로 소비 (앞에 await 안 붙임)
     async for doc in query.stream():
-        data = doc.to_dict()
+        data = doc.to_dict() or {}
         data["id"] = doc.id
         rooms.append(data)
     logger.info("get_rooms: %d rooms for %s", len(rooms), user_email)
@@ -155,7 +155,7 @@ async def get_room(room_id: str, user_email: str) -> dict | None:
         logger.warning("get_room: room not found (room_id=%s)", room_id)
         return None
 
-    data = doc.to_dict()
+    data = doc.to_dict() or {}
     # ★ 소유자 검증: 이메일 대소문자 차이로 오탐/우회되지 않도록 lower() 로 일관 비교
     owner = (data.get("user_email") or "").lower()
     if owner != user_email.lower():
@@ -206,7 +206,7 @@ async def save_message(
     - role 검증: "user" | "assistant" 만 허용 (그 외 ValueError).
     - sources/feedback/grounded/confidence 필드는 assistant role 일 때만 추가한다.
     - grounded/confidence 는 답변 검증 레이어(ai_service) 결과로, 환각률 추적의
-      핵심 신호다(14단계 BigQuery). validation 비활성 시 None 으로 들어올 수 있다.
+      핵심 신호다(BigQuery 분석 예정). validation 비활성 시 None 으로 들어올 수 있다.
     - 저장 후 부모 룸 updated_at 을 갱신해 목록 최신순 정렬을 유지한다.
 
     Args:
@@ -237,7 +237,7 @@ async def save_message(
     if role == "assistant":
         msg["sources"] = sources or []
         msg["feedback"] = None
-        msg["grounded"] = grounded        # S6: 환각률 추적 (14단계 BigQuery)
+        msg["grounded"] = grounded        # 환각률 추적 (BigQuery 분석 예정)
         msg["confidence"] = confidence
 
     room_ref = db.collection("chat_rooms").document(room_id)
@@ -273,7 +273,7 @@ async def get_messages(room_id: str, limit: int = 100) -> list[dict]:
     )
     messages: list[dict] = []
     async for doc in query.stream():
-        data = doc.to_dict()
+        data = doc.to_dict() or {}
         data["id"] = doc.id
         messages.append(data)
     logger.info("get_messages: %d messages for room %s", len(messages), room_id)
@@ -284,7 +284,7 @@ async def update_feedback(room_id: str, message_id: str, feedback: str) -> None:
     """메시지 피드백을 갱신한다.
 
     - feedback 검증: "up" | "down" 만 허용 (그 외 ValueError).
-      운영 데이터(14단계 BigQuery)에서 만족도 집계의 기반이 되므로 값 무결성이 중요.
+      운영 데이터(BigQuery 분석 예정)에서 만족도 집계의 기반이 되므로 값 무결성이 중요.
     """
     if feedback not in _VALID_FEEDBACK:
         raise ValueError(f"invalid feedback: {feedback!r} (허용: up, down)")

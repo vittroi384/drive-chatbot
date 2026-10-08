@@ -1,9 +1,9 @@
-"""Chat / Room API 모델 (8단계 — API 경계 전용).
+"""Chat / Room API 모델 (API 경계 전용).
 
 내부 검색 결과 타입은 app.search.base.SearchResult(dataclass)이고,
 저장은 Firestore dict다. 이 pydantic 모델들은 HTTP 입출력 경계에서만 쓴다.
 
-[S5 결정] 채팅 경로의 '출처'는 {title, uri, score} 한 가지 모양으로 통일.
+채팅 경로의 '출처'는 {title, uri, score} 한 가지 모양으로 통일.
   - ai_service.ask() 출력이 이미 이 모양 (ai_service.py:413-416)
   - database.save_message(sources=...) 가 그대로 저장 (database.py:232)
   - get_messages() 가 그대로 반환
@@ -42,7 +42,7 @@ class ChatRequest(BaseModel):
 class FeedbackRequest(BaseModel):
     """POST /api/rooms/{room_id}/messages/{message_id}/feedback 입력.
 
-    pattern 으로 up|down 만 허용 — 14단계 BigQuery 만족도 집계의 값 무결성.
+    pattern 으로 up|down 만 허용 — BigQuery 만족도 집계(예정)의 값 무결성.
     """
 
     feedback: str = Field(pattern="^(up|down)$")

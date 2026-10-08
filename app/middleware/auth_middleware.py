@@ -1,4 +1,4 @@
-"""로그인 필수 미들웨어 (5단계, 8단계에서 API 분기 추가).
+"""로그인 필수 미들웨어.
 
 PUBLIC_PATHS 외의 모든 경로는 로그인 필요. 미인증 시:
   - /api/*  (JSON 클라이언트) → 401 JSON
@@ -9,9 +9,9 @@ PUBLIC_PATHS 외의 모든 경로는 로그인 필요. 미인증 시:
 
 from __future__ import annotations
 
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
-from starlette.responses import JSONResponse, RedirectResponse
+from starlette.responses import JSONResponse, RedirectResponse, Response
 
 from app.utils.auth_utils import get_user_email
 
@@ -39,7 +39,9 @@ def _is_public(path: str) -> bool:
 class AuthRequiredMiddleware(BaseHTTPMiddleware):
     """미인증 요청을 차단한다. API 는 401 JSON, 그 외는 /login 으로 302."""
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(
+        self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
         path = request.url.path
 
         # 공개 경로는 그냥 통과
