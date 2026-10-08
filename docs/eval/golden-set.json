@@ -1,0 +1,36 @@
+{
+  "version": "0.1-draft",
+  "status": "초안(더미). 공개판 가상 샘플 문서 10개(samples-by-folder/) 기준으로 작성. 측정 스크립트·수치는 아직 없음.",
+  "corpus": "samples-by-folder/ 의 10개 문서를 GCS 에 적재해 Vertex AI Search 에 인덱싱한 상태를 전제",
+  "fields": {
+    "id": "문항 번호",
+    "category": "policy | faq | manual | meeting | negative",
+    "question": "사용자가 실제로 칠 법한 질문",
+    "expected_answer": "정답 요지(채점은 요지 포함 여부, 문자열 일치 아님)",
+    "expected_sources": "답의 근거가 되어야 하는 문서 파일명. negative 는 빈 배열",
+    "difficulty": "easy(한 문서 한 문장) | medium(표·목록 해석) | hard(두 문서 교차 또는 추론)",
+    "expected_grounded": "검증 단계가 grounded=true 를 내야 하는지. negative 는 false"
+  },
+  "items": [
+    {"id": 1, "category": "faq", "question": "코어타임이 몇 시부터 몇 시까지야?", "expected_answer": "오전 10시부터 오후 4시", "expected_sources": ["faq-general.md", "onboarding-guide.pdf"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 2, "category": "faq", "question": "재택근무 주에 몇 번까지 되고 누구 승인이 필요해?", "expected_answer": "주 2회, 팀장 승인", "expected_sources": ["faq-general.md", "onboarding-guide.pdf"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 3, "category": "policy", "question": "입사 1년 차 연차 며칠이고 최대 며칠까지 늘어나?", "expected_answer": "15일, 근속 1년마다 1일 추가, 최대 25일", "expected_sources": ["vacation-policy.docx"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 4, "category": "policy", "question": "작년에 못 쓴 연차 언제까지 쓸 수 있어?", "expected_answer": "익년 3월까지 이월 가능", "expected_sources": ["vacation-policy.docx"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 5, "category": "policy", "question": "반반차는 몇 시간 단위야?", "expected_answer": "2시간 단위", "expected_sources": ["vacation-policy.docx"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 6, "category": "policy", "question": "배우자가 출산하면 휴가 며칠 받아?", "expected_answer": "10일", "expected_sources": ["vacation-policy.docx"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 7, "category": "policy", "question": "직원이 국내 출장 가면 일당이랑 숙박비 한도가 얼마야?", "expected_answer": "일당 5만 원, 숙박비 한도 10만 원", "expected_sources": ["travel-expense.pdf"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 8, "category": "policy", "question": "유럽 출장 숙박비 한도는?", "expected_answer": "30만 원(미주/유럽)", "expected_sources": ["travel-expense.pdf"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 9, "category": "policy", "question": "출장 다녀오면 정산서 언제까지 내야 해?", "expected_answer": "출장 종료 후 7일 이내, 영수증 첨부", "expected_sources": ["travel-expense.pdf"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 10, "category": "policy", "question": "비즈니스석 탈 수 있는 조건이 뭐야?", "expected_answer": "4시간 이상 비행, 사전 승인, 임원 한정", "expected_sources": ["travel-expense.pdf"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 11, "category": "policy", "question": "금요일 복장 규정 있어?", "expected_answer": "매주 금요일은 캐주얼 데이", "expected_sources": ["dress-code.txt"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 12, "category": "manual", "question": "20명 들어가는 회의실 어디야?", "expected_answer": "3층 대회의실(화상회의 장비)", "expected_sources": ["meeting-room-booking.md"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 13, "category": "manual", "question": "회의실 노쇼 몇 번이면 예약 못 해?", "expected_answer": "3회 누적 시 예약 권한 제한", "expected_sources": ["meeting-room-booking.md"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 14, "category": "manual", "question": "프로젝터 빌리려면 어떻게 하고 최대 며칠이야?", "expected_answer": "IT팀에 대여 신청서 제출, 승인 후 수령, 최대 30일(연장은 재신청)", "expected_sources": ["equipment-rental.docx"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 15, "category": "manual", "question": "입사 첫날 출입카드 어디서 받아?", "expected_answer": "1층 안내데스크", "expected_sources": ["onboarding-guide.pdf"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 16, "category": "manual", "question": "보안 교육은 입사 며칠 안에 들어야 하고 담당은 어디야?", "expected_answer": "입사 3일 내, IT팀", "expected_sources": ["onboarding-guide.pdf"], "difficulty": "medium", "expected_grounded": true},
+    {"id": 17, "category": "faq", "question": "VPN 안 되면 어떻게 해?", "expected_answer": "사외에서는 VPN 클라이언트 실행 필요, 안 되면 IT팀(내선 1234) 문의", "expected_sources": ["faq-it-support.txt", "onboarding-guide.pdf"], "difficulty": "easy", "expected_grounded": true},
+    {"id": 18, "category": "meeting", "question": "AI 챗봇 파일럿은 언제 결정됐고 결과 보고는 언제야?", "expected_answer": "2026-01-15 1분기 회의에서 파일럿 진행 결정, 결과는 다음 분기(2분기) 보고", "expected_sources": ["meeting-2026-q1.docx"], "difficulty": "hard", "expected_grounded": true},
+    {"id": 19, "category": "negative", "question": "야근 수당은 시간당 얼마야?", "expected_answer": "문서에 근거 없음을 밝히고 답하지 않아야 함", "expected_sources": [], "difficulty": "hard", "expected_grounded": false},
+    {"id": 20, "category": "negative", "question": "2026년 3분기 회의 참석자가 누구였어?", "expected_answer": "3분기 회의록은 없음(2분기 회의록에 다음 회의 2026-07-15 예정만 있음). 근거 없음을 밝혀야 함", "expected_sources": [], "difficulty": "hard", "expected_grounded": false}
+  ]
+}
