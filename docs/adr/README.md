@@ -26,6 +26,9 @@
 | [0008](0008-history-truncation.md) | 대화 컨텍스트 truncation 정책 (최근 5 문답) | Accepted |
 | [0009](0009-rate-limit-policy.md) | Rate Limit 정책 (1분 5회 / 사용자) | Accepted |
 | [0010](0010-frontend-vanilla-js.md) | 프론트엔드: Vanilla JS + Jinja2 | Accepted |
+| [0011](0011-docker-strategy.md) | Docker 패키징 + Secret 관리 전략 | Accepted |
+| [0012](0012-cloud-run-deployment.md) | Cloud Run 배포 전략 (direct IAP + Workload Identity) | Accepted |
+| [0013](0013-secret-manager-injection.md) | Secret Manager 주입 전략 (`--set-secrets` 환경변수 주입) | Accepted |
 
 0006은 폐기했고 번호는 비워 둔다.
 

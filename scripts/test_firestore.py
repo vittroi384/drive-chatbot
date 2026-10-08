@@ -58,7 +58,11 @@ async def main() -> None:
         "assistant",
         "휴가는 X 시스템에서 신청합니다. 연차는 자동 차감됩니다.",
         sources=[
-            {"title": "휴가규정.docx", "uri": "gs://bucket/휴가규정.docx", "score": 0.92}
+            {
+                "title": "휴가규정.docx",
+                "uri": "gs://bucket/휴가규정.docx",
+                "score": 0.92,
+            }
         ],
         tokens_used=120,
         response_time_ms=850,
@@ -85,8 +89,10 @@ async def main() -> None:
     mine = await get_room(room_id, TEST_EMAIL)
     other = await get_room(room_id, ATTACKER_EMAIL)
     print(f"   본인({TEST_EMAIL}) 접근    : {'dict 반환 OK' if mine else 'None'}")
-    print(f"   타인({ATTACKER_EMAIL}) 접근: "
-          f"{'None — 차단됨 OK' if other is None else '!!! 노출됨 — 보안 버그 !!!'}")
+    print(
+        f"   타인({ATTACKER_EMAIL}) 접근: "
+        f"{'None — 차단됨 OK' if other is None else '!!! 노출됨 — 보안 버그 !!!'}"
+    )
     assert mine is not None, "본인 룸은 반환되어야 함"
     assert other is None, "★ 소유자 검증 실패 — IDOR 취약점!"
 

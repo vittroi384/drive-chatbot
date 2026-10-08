@@ -86,7 +86,9 @@ def get_user_email(request: Request) -> str | None:
                 return None
             if email_header and email_header.removeprefix(_IAP_PREFIX).lower() != email:
                 logger.warning(
-                    "[iap] email header mismatch (header=%s, jwt=%s)", email_header, email
+                    "[iap] email header mismatch (header=%s, jwt=%s)",
+                    email_header,
+                    email,
                 )
             return email
 
@@ -147,5 +149,7 @@ def is_domain_allowed(email: str) -> bool:
         return True
 
     # 이메일 화이트리스트 매치 (개인 GCP 테스트 예외)
-    allowed = [e.strip().lower() for e in settings.allowed_emails.split(",") if e.strip()]
+    allowed = [
+        e.strip().lower() for e in settings.allowed_emails.split(",") if e.strip()
+    ]
     return email in allowed

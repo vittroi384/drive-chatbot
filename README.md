@@ -14,7 +14,7 @@
 > **상태**: 회사 GCP Cloud Run으로 이전 완료, 운영 중
 > (에러 핸들링·알림 체계 구축 중 → 이후 골든셋 기반 품질 평가, BigQuery 분석 파이프라인 예정. [로드맵](#로드맵) 참고)
 >
-> 공개판은 회사 식별자를 제거한 뒤 단일 커밋으로 재게시한 사본이다. 배포 구성(Dockerfile·Cloud Run·IAP 설정)은 사내 저장소에 있다.
+> 공개판은 회사 식별자를 제거한 뒤 단일 커밋으로 재게시한 사본이다. Dockerfile·Cloud Run·Secret Manager 구성은 저장소에 포함(ADR 0011~0013), 실제 프로젝트 ID 등은 자리표시자.
 
 ---
 
@@ -65,7 +65,7 @@
 | 항목 | 적용 내용 |
 |---|---|
 | 접근 제어 | Cloud Run 앞단에 **IAP**(Identity-Aware Proxy) — 허용된 계정만 접근. 앱은 `X-Goog-IAP-JWT-Assertion` 의 서명·audience 를 검증한 뒤 이메일을 사용 (`app/utils/auth_utils.py`) |
-| 비밀 관리 | API 키·자격증명은 **Secret Manager**로 분리, 코드·이미지에 미포함 |
+| 비밀 관리 | API 키·자격증명은 **Secret Manager**로 분리, 코드·이미지에 미포함 (`--set-secrets` 환경변수 주입, ADR 0013) |
 | 인증 | Google OAuth 2.0 — 관리자 권한 없이 개인 인증 방식 |
 | 비용 통제 | GCP 프로젝트 분리 + 예산 알림 가드레일, API Rate Limit (사용량 미터링은 로그 1줄) |
 | 안정성 | 에러 핸들링·장애 알림 체계 구축 중 (진행 중) |
@@ -88,6 +88,7 @@
 - 하이브리드 데이터소스 구성 (0005) — 공용 검색과 개인 문서 검색을 분리한 이유
 - 청킹·임베딩 전략 (0003·0004) — 문서 분할 단위와 검색 품질의 트레이드오프
 - RAG 파이프라인 (0007) — 재정렬·근거 검증을 별도 호출로 둔 이유와 비용
+- 배포 구성 (0011·0012·0013) — slim 이미지·allowlist COPY, Cloud Run direct IAP + Workload Identity, `--set-secrets` 주입
 
 ## 테스트 · 코드 품질
 
@@ -120,8 +121,8 @@ uvicorn app.main:app --reload --port 8000
 - [x] 4단계 RAG 파이프라인 (검색→재정렬→생성→검증)
 - [x] API 엔드포인트 + Rate Limit · [ ] 사용량 미터링 (현재 로그 1줄)
 - [x] 화이트라벨 UI + 사용자 피드백 수집
-- [x] Docker 패키징 + Secret Manager (배포 구성은 사내 저장소)
-- [x] Cloud Run 배포 + IAP + 커스텀 도메인 (배포 구성은 사내 저장소)
+- [x] Docker 패키징 + Secret Manager (ADR 0011·0013)
+- [x] Cloud Run 배포 + IAP + 커스텀 도메인 (ADR 0012)
 - [x] IAP JWT 검증 적용 (이번 커밋)
 - [ ] 에러 핸들링 + 장애 알림 **(진행 중)**
 - [ ] 골든셋 기반 RAG 품질 평가 — 답변 정확도를 수치로 측정·개선
@@ -137,4 +138,4 @@ uvicorn app.main:app --reload --port 8000
 - 검색 로그에 질문 원문이 남는다 (`app/search/hybrid.py`·`vertex.py`·`oauth_drive.py` 의 `query=%r` 로그)
 - 프롬프트에 문서·질문을 구분자 없이 삽입한다 — 문서 본문에 섞인 지시문을 분리하지 않는다 (`app/ai_service.py` `RERANK_PROMPT`·`ANSWER_PROMPT_TEMPLATE`·`VALIDATION_PROMPT`)
 - Vertex 코퍼스는 인증된 사용자 전원이 열람한다 — `user_email` 로 결과를 거르지 않는다 (`app/search/vertex.py` `search`)
-- Rate Limit 카운터가 프로세스 메모리에 있어 단일 인스턴스를 전제한다 (`app/utils/rate_limit.py`, ADR 0009)
+- Rate Limit 카운터가 프로세스 메모리에 있어 단일 인스턴스를 전제한다 — Cloud Run max 인스턴스 2 라 최악 1분 10회 (`app/utils/rate_limit.py`, ADR 0009·0012)

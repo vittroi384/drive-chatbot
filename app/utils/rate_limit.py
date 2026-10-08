@@ -27,10 +27,10 @@ def get_user_key(request: Request) -> str:
     slowapi 가 매 요청마다 이 함수를 호출해 키를 만든다. 같은 키 = 같은 카운터.
     이메일은 대소문자를 정규화해 'User@x' 와 'user@x' 가 한 사람으로 묶이게 한다.
     """
-    email = get_user_email(request)              # IAP 헤더 우선, 세션 폴백 (auth_utils)
+    email = get_user_email(request)  # IAP 헤더 우선, 세션 폴백 (auth_utils)
     if email:
-        return f"user:{email.lower()}"           # 사용자별 카운터
-    return f"ip:{get_remote_address(request)}"   # 미인증 폴백 (로컬/엣지 케이스)
+        return f"user:{email.lower()}"  # 사용자별 카운터
+    return f"ip:{get_remote_address(request)}"  # 미인증 폴백 (로컬/엣지 케이스)
 
 
 # Limiter 싱글톤. default_limits 는 '기본 한도'지만, 실제 강제는 라우터의

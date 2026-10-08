@@ -1,0 +1,68 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# .dockerignore — 빌드 컨텍스트에서 제외할 것 (ADR 0011)
+#
+# 역할 2가지:
+#   1) 비밀 차단(2차 방어). 1차 방어는 Dockerfile 의 allowlist COPY(app/ templates/ static/).
+#   2) 빌드 컨텍스트 슬리밍 — .venv/ .git/ 샘플문서 등을 데몬에 안 보내 빌드 가속.
+#
+# 패턴 메모: .dockerignore 는 컨텍스트 루트 기준 매칭. 중첩 디렉토리까지 잡으려면 ** 사용.
+#   '!' 는 예외(다시 포함). 위에서 제외한 걸 아래에서 되살릴 때.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# === 비밀 — 절대 이미지/컨텍스트 포함 금지 (★) ===
+.env
+.env.*
+!.env.example
+secrets/
+*.json
+**/*.json
+service-account*.json
+*-key.json
+*-credentials.json
+
+# === Python 가상환경 / 바이트코드 캐시 ===
+.venv/
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# === 버전관리 / CI 메타 (런타임 불필요) ===
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# === 테스트 / 문서 / 스크립트 / 샘플 (운영 이미지 불필요) ===
+tests/
+docs/
+scripts/
+seed/
+samples-by-folder/
+README.md
+
+# === 로컬 진행 노트 (결제계정 ID 등 민감 — 로컬 전용, .gitignore 와 동일 사유) ===
+progress/
+
+# === 린트 / 타입 / 커버리지 캐시 ===
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+dist/
+build/
+
+# === OS / IDE 잡파일 ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === 로그 ===
+*.log
+
+# === 로컬 전용 도구 ===
+verify-env.ps1

@@ -82,6 +82,7 @@ async def warmup_firestore() -> None:
 # 대화방 (chat_rooms)
 # ===========================================================================
 
+
 async def create_room(
     user_email: str,
     company_id: str = "examplecorp",
@@ -237,7 +238,7 @@ async def save_message(
     if role == "assistant":
         msg["sources"] = sources or []
         msg["feedback"] = None
-        msg["grounded"] = grounded        # 환각률 추적 (BigQuery 분석 예정)
+        msg["grounded"] = grounded  # 환각률 추적 (BigQuery 분석 예정)
         msg["confidence"] = confidence
 
     room_ref = db.collection("chat_rooms").document(room_id)
@@ -296,6 +297,4 @@ async def update_feedback(room_id: str, message_id: str, feedback: str) -> None:
         .document(message_id)
         .update({"feedback": feedback})
     )
-    logger.info(
-        "Feedback updated: room=%s msg=%s -> %s", room_id, message_id, feedback
-    )
+    logger.info("Feedback updated: room=%s msg=%s -> %s", room_id, message_id, feedback)

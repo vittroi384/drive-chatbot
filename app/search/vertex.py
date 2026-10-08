@@ -85,7 +85,9 @@ class VertexSearchBackend(DocumentSearchService):
             f"/collections/default_collection"
         )
         if self.search_target == "engine" and self.engine_id:
-            return f"{base}/engines/{self.engine_id}/servingConfigs/{self.serving_config}"
+            return (
+                f"{base}/engines/{self.engine_id}/servingConfigs/{self.serving_config}"
+            )
         return f"{base}/dataStores/{self.data_store_id}/servingConfigs/{self.serving_config}"
 
     async def search(

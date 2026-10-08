@@ -79,16 +79,16 @@ async def create_chat(
         # ★함정★ ask() 가 터지면 3)의 user 메시지가 '고아'로 남는다.
         #   assistant 자리에 에러 메시지를 저장해 턴을 완결시키고 500 을 반환한다.
         #   (정식 에러 핸들링/알림은 후속.)
-        logger.error("[chat] ask() failed (room=%s, user=%s)", room_id, user_email, exc_info=True)
+        logger.error(
+            "[chat] ask() failed (room=%s, user=%s)", room_id, user_email, exc_info=True
+        )
         await database.save_message(
             room_id,
             "assistant",
             "[일시적인 오류로 답변을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.]",
             grounded=None,
         )
-        raise HTTPException(
-            status_code=500, detail="answer_generation_failed"
-        ) from exc
+        raise HTTPException(status_code=500, detail="answer_generation_failed") from exc
 
     # ── 6) assistant 메시지 저장 (출처/토큰/시간 + 검증신호 grounded/confidence) ──
     validation = result["validation"]  # ★함정★ dict 접근 (result.answer 점 접근 아님)
@@ -99,7 +99,7 @@ async def create_chat(
         sources=result["sources"],
         tokens_used=result["tokens_used"],
         response_time_ms=result["response_time_ms"],
-        grounded=validation.get("grounded"),       # 환각률 추적
+        grounded=validation.get("grounded"),  # 환각률 추적
         confidence=validation.get("confidence"),
     )
 

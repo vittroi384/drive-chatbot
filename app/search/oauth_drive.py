@@ -77,7 +77,9 @@ class OAuthDriveBackend(DocumentSearchService):
             )
             for f in files[:top_k]
         ]
-        logger.info("[oauth] query=%r → %d files for %s", query, len(results), user_email)
+        logger.info(
+            "[oauth] query=%r → %d files for %s", query, len(results), user_email
+        )
         return results
 
     @staticmethod

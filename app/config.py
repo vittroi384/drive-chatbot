@@ -67,8 +67,8 @@ class Settings(BaseSettings):
     #   data store 직접 경로(dataStores/{id}/servingConfigs/default_config)는 404.
     #   정답: engines/{engine_id}/servingConfigs/default_serving_config
     #   (vertex_search_target=engine, vertex_serving_config=default_serving_config)
-    vertex_data_store_id: str = ""   # short id, 예: my-docs-datastore_0000000000000
-    vertex_engine_id: str = ""       # search app id, 예: drive-chatbot-search_1779696087733
+    vertex_data_store_id: str = ""  # short id, 예: my-docs-datastore_0000000000000
+    vertex_engine_id: str = ""  # search app id, 예: drive-chatbot-search_1779696087733
     vertex_serving_config: str = "default_serving_config"
     vertex_location: str = "global"  # REGION_VERTEX_SEARCH
 

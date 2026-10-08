@@ -41,9 +41,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     모든 로그가 같은 포맷으로 남는다. uvicorn 은 root 로거에 핸들러를 붙이지 않으므로,
     이 basicConfig 가 있어야 app.* 의 INFO 로그(미터링/타이밍)가 실제로 출력된다.
     """
-    configure_logging()              # app.* INFO 로그가 묻히지 않도록 (미터링 가시성)
+    configure_logging()  # app.* INFO 로그가 묻히지 않도록 (미터링 가시성)
     logger.info("startup: 로깅 설정 완료, Firestore 워밍업 시작")
-    await warmup_firestore()         # 콜드스타트 완화 (워밍업 실패해도 기동은 계속됨)
+    await warmup_firestore()  # 콜드스타트 완화 (워밍업 실패해도 기동은 계속됨)
     yield
     # shutdown: 현재 정리할 리소스 없음 (Firestore AsyncClient 는 프로세스 종료 시 회수)
 
@@ -72,8 +72,8 @@ app.add_middleware(
     max_age=60 * 60 * 8,  # 8시간
 )
 app.include_router(auth_router.router)
-app.include_router(chat.router)      # /api/chat
-app.include_router(rooms.router)     # /api/rooms, .../messages, .../feedback
+app.include_router(chat.router)  # /api/chat
+app.include_router(rooms.router)  # /api/rooms, .../messages, .../feedback
 
 # --- 정적 파일 + 템플릿 ------------------------------------------------
 # 경로를 __file__ 기준(프로젝트 루트 = app/ 의 부모)으로 잡아 CWD 에 의존하지 않게 함.

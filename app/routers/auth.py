@@ -37,8 +37,8 @@ oauth.register(
     client_kwargs={
         # 최소 권한: drive 는 readonly/metadata.readonly 만 (쓰기 권한 없음).
         "scope": "openid email profile "
-                 "https://www.googleapis.com/auth/drive.readonly "
-                 "https://www.googleapis.com/auth/drive.metadata.readonly",
+        "https://www.googleapis.com/auth/drive.readonly "
+        "https://www.googleapis.com/auth/drive.metadata.readonly",
         # refresh_token 을 받기 위해 매번 동의 화면 강제(함정: 빼먹으면 refresh_token 없음).
         "prompt": "consent",
     },

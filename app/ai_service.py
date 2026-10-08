@@ -36,7 +36,7 @@ NOT_FOUND_MESSAGE = "제공된 문서에서 해당 내용을 찾을 수 없습�
 
 # 파이프라인 기본 파라미터 (필요 시 ask 인자로 override).
 DEFAULT_TOP_K = 20  # 검색 candidate 수
-DEFAULT_TOP_N = 5   # rerank 후 남길 수
+DEFAULT_TOP_N = 5  # rerank 후 남길 수
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ def _build_system_instruction() -> str:
         f"당신은 {company} 사내 문서 기반 QA 챗봇입니다.\n"
         "다음 규칙을 반드시 지키세요:\n"
         "1. 제공된 '검색된 문서'에 명시된 내용에만 근거해 답변한다.\n"
-        f"2. 문서에서 답을 찾을 수 없으면 정확히 \"{NOT_FOUND_MESSAGE}\" 라고만 답한다.\n"
+        f'2. 문서에서 답을 찾을 수 없으면 정확히 "{NOT_FOUND_MESSAGE}" 라고만 답한다.\n'
         "3. 답변 마지막에 근거 문서를 [1], [2] 형식으로 표기한다.\n"
         "4. 한국어로 친절하고 명확하게 답한다.\n"
         "5. 문서에 없는 사실을 추측하거나 지어내지 않는다. (환각 절대 금지)"
@@ -253,7 +253,7 @@ def _truncate_history(history: list[dict] | None, max_pairs: int = 5) -> str:
     if not history:
         return "(이전 대화 없음)"
 
-    recent = history[-(max_pairs * 2):]
+    recent = history[-(max_pairs * 2) :]
     lines: list[str] = []
     for msg in recent:
         role = (msg.get("role") or "").lower()
@@ -354,7 +354,9 @@ async def validate_answer(
             "reason": str(data.get("reason", "")),
         }, tokens
     except Exception:  # noqa: BLE001
-        logger.error("[ai] validate_answer failed → fallback grounded=True", exc_info=True)
+        logger.error(
+            "[ai] validate_answer failed → fallback grounded=True", exc_info=True
+        )
         return {"grounded": True, "confidence": 0.5, "reason": "Validation error"}, 0
 
 
@@ -393,7 +395,9 @@ async def ask(
     t_search = time.time()
 
     # 2) Rerank (top_n)
-    reranked, rerank_tokens = await rerank_results(query, raw_results, top_n=DEFAULT_TOP_N)
+    reranked, rerank_tokens = await rerank_results(
+        query, raw_results, top_n=DEFAULT_TOP_N
+    )
     t_rerank = time.time()
 
     # 3) Generate
