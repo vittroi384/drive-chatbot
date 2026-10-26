@@ -30,25 +30,7 @@
 
 ## 아키텍처
 
-```
-사용자 질문
-   │
-   ▼
-[1. 검색]  Vertex AI Search (공용 문서, GCS 인덱스)
-   │        + Drive 파일명 검색 (로컬 OAuth 세션 한정, 운영은 Vertex 단독)
-   │        hybrid 모드는 백엔드당 최대 10건 (top_k 20의 절반씩)
-   ▼
-[2. 재정렬]  Gemini re-rank — 후보를 질문 관련도로 다시 점수화해 top-5
-   ▼
-[3. 생성]  Gemini — 재정렬된 문서 근거로만 답변 생성
-   ▼
-[4. 검증]  근거 검증 — 답변의 근거 포함 여부를 grounded 플래그로 기록 (차단 아님)
-   │
-   ▼
-답변 + 근거 문서 출처
-
-대화 로그 ──▶ Firestore(실시간 저장) ──▶ BigQuery(분석, 예정)
-```
+![RAG 챗봇 시스템 아키텍처](assets/architecture.png)
 
 ## 주요 특징
 
