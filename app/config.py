@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     # --- GCP -----------------------------------------------------------------
     gcp_project_id: str = "drive-chatbot-dev-personal"
     gcp_location: str = "asia-northeast3"  # REGION_GENERAL (서울)
-    gcp_credentials_path: str = r"C:\dev\secrets\chatbot-app-sa.json"
+    gcp_credentials_path: str = ""
 
     # --- OAuth ---------------------------------------------------------------
     google_client_id: str = ""

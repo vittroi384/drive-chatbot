@@ -72,7 +72,7 @@ Write-Host ""
 
 # 작업 디렉토리 확인
 Write-Host "[Work Directories]" -ForegroundColor Cyan
-@("C:\dev\drive-chatbot", "C:\dev\secrets") | ForEach-Object {
+@($PSScriptRoot) | ForEach-Object {
     if (Test-Path $_) {
         Write-Host "  EXISTS: $_" -ForegroundColor Green
     } else {
